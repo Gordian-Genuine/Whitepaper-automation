@@ -18,7 +18,18 @@ async function hmac(secret: string, msg: string) {
   return [...new Uint8Array(sig)].map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 32);
 }
 
-export const GET: APIRoute = async ({ request, locals }) => {
+export const GET: APIRoute = async (ctx) => {
+  try {
+    return await handle(ctx);
+  } catch (e: any) {
+    console.error('whitepaper endpoint failed:', e && e.stack ? e.stack : e);
+    const msg = (e && e.message) ? String(e.message).slice(0, 200) : 'unknown error';
+    return page(500, 'Could not prepare your copy', `Something went wrong while preparing the file (${msg}). Please try again in a minute or write to info@genuine.agency.`);
+  }
+};
+
+async function handle({ request, locals }: Parameters<APIRoute>[0]): Promise<Response> {
+
   const env = (locals as any).runtime?.env ?? {};
   const url = new URL(request.url);
   const email = (url.searchParams.get('email') || url.searchParams.get('e') || '').trim().toLowerCase();
@@ -63,9 +74,13 @@ export const GET: APIRoute = async ({ request, locals }) => {
 
   if (!name) name = email.split('@')[0];
   const pdfUrl = env.PDF_URL || DEFAULT_PDF;
-  const cache = (caches as any).default as Cache | undefined;
-  let srcRes = cache ? await cache.match(pdfUrl) : undefined;
-  if (!srcRes) { srcRes = await fetch(pdfUrl, { cf: { cacheEverything: true } } as any); if (cache && srcRes.ok) await cache.put(pdfUrl, srcRes.clone()); }
+  const cache = (typeof caches !== 'undefined' && (caches as any).default) ? ((caches as any).default as Cache) : undefined;
+  let srcRes: Response | undefined;
+  try { srcRes = cache ? await cache.match(pdfUrl) : undefined; } catch (e) { console.warn('cache.match failed', e); }
+  if (!srcRes) {
+    srcRes = await fetch(pdfUrl, { cf: { cacheEverything: true } } as any);
+    if (cache && srcRes.ok) { try { await cache.put(pdfUrl, srcRes.clone()); } catch (e) { console.warn('cache.put failed', e); } }
+  }
   if (!srcRes.ok) return page(502, 'Source file unavailable', 'The white paper file could not be loaded. Please try again later.');
 
   const date = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -78,4 +93,4 @@ export const GET: APIRoute = async ({ request, locals }) => {
       'cache-control': 'private, no-store',
     },
   });
-};
+}
