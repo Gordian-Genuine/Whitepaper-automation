@@ -1,4 +1,4 @@
-# GENUINE white paper service (Webflow Cloud)
+# GENUINE report service (Webflow Cloud)
 
 Astro app mounted at `/app` on genuine.agency. One endpoint:
 

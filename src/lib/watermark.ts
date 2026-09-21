@@ -16,7 +16,7 @@ export async function watermarkPdf(src: ArrayBuffer, name: string, email: string
     const fw = reg.widthOfTextAtSize(foot, 6.5);
     page.drawText(foot, { x: width - 28 - fw, y: 14, size: 6.5, font: reg, color: rgb(0.35, 0.4, 0.5), opacity: 0.9 });
   }
-  pdf.setTitle('The European Affiliate Map');
+  pdf.setTitle('TikTok Shop EU Creator Report 2026');
   pdf.setSubject(`Personal copy for ${name}`);
   pdf.setProducer('GENUINE Beauty GmbH');
   return pdf.save({ useObjectStreams: false });

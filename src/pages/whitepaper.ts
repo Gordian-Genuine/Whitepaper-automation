@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import SparkMD5 from 'spark-md5';
 import { watermarkPdf } from '../lib/watermark';
 
-const DEFAULT_PDF = 'https://cdn.prod.website-files.com/6931628fa2e19aa6da06c119/6aad2cea7eefb2d0086b982b_genuine-the-european-affiliate-map.pdf';
+const DEFAULT_PDF = 'https://cdn.prod.website-files.com/6931628fa2e19aa6da06c119/6ab100df04ca9fd1329166fa_genuine-tiktok-shop-eu-creator-report-2026.pdf';
 
 function page(status: number, title: string, text: string, link?: { href: string; label: string }) {
   const body = `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${title}</title><meta name="robots" content="noindex"></head>
@@ -34,7 +34,7 @@ async function handle({ request, locals }: Parameters<APIRoute>[0]): Promise<Res
   const url = new URL(request.url);
   const email = (url.searchParams.get('email') || url.searchParams.get('e') || '').trim().toLowerCase();
   if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-    return page(400, 'Missing e-mail address', 'Please use the download link from your confirmation e-mail.', { href: '/affiliate-map', label: 'Request the white paper' });
+    return page(400, 'Missing e-mail address', 'Please use the download link from your confirmation e-mail.', { href: '/affiliate-map', label: 'Request the report' });
   }
 
   let name = '';
@@ -68,8 +68,8 @@ async function handle({ request, locals }: Parameters<APIRoute>[0]): Promise<Res
   }
 
   if (!allowed) {
-    if (!env.MAILCHIMP_API_KEY && !env.WATERMARK_SECRET) return page(503, 'Service not configured', 'The white paper service is missing its Mailchimp configuration.');
-    return page(403, 'No subscription found', `We could not find a confirmed subscription for ${email}.`, { href: '/affiliate-map', label: 'Request the white paper' });
+    if (!env.MAILCHIMP_API_KEY && !env.WATERMARK_SECRET) return page(503, 'Service not configured', 'The report service is missing its Mailchimp configuration.');
+    return page(403, 'No subscription found', `We could not find a confirmed subscription for ${email}.`, { href: '/affiliate-map', label: 'Request the report' });
   }
 
   if (!name) name = email.split('@')[0];
@@ -81,7 +81,7 @@ async function handle({ request, locals }: Parameters<APIRoute>[0]): Promise<Res
     srcRes = await fetch(pdfUrl, { cf: { cacheEverything: true } } as any);
     if (cache && srcRes.ok) { try { await cache.put(pdfUrl, srcRes.clone()); } catch (e) { console.warn('cache.put failed', e); } }
   }
-  if (!srcRes.ok) return page(502, 'Source file unavailable', 'The white paper file could not be loaded. Please try again later.');
+  if (!srcRes.ok) return page(502, 'Source file unavailable', 'The report file could not be loaded. Please try again later.');
 
   const date = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
   const bytes = await watermarkPdf(await srcRes.arrayBuffer(), name, email, date);
@@ -89,7 +89,7 @@ async function handle({ request, locals }: Parameters<APIRoute>[0]): Promise<Res
   return new Response(bytes, {
     headers: {
       'content-type': 'application/pdf',
-      'content-disposition': `attachment; filename="GENUINE-European-Affiliate-Map-${safe}.pdf"`,
+      'content-disposition': `attachment; filename="GENUINE-TikTok-Shop-EU-Creator-Report-2026-${safe}.pdf"`,
       'cache-control': 'private, no-store',
     },
   });
