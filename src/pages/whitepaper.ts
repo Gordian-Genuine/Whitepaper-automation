@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import SparkMD5 from 'spark-md5';
 import { watermarkPdf } from '../lib/watermark';
 
-const DEFAULT_PDF = 'https://cdn.prod.website-files.com/6931628fa2e19aa6da06c119/6ab100df04ca9fd1329166fa_genuine-tiktok-shop-eu-creator-report-2026.pdf';
+const DEFAULT_PDF = 'https://cdn.prod.website-files.com/6931628fa2e19aa6da06c119/6ab15c00a3f801ec3ef3a65b_genuine-tiktok-shop-eu-creator-report-2026-v2.pdf';
 
 function page(status: number, title: string, text: string, link?: { href: string; label: string }) {
   const body = `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${title}</title><meta name="robots" content="noindex"></head>
